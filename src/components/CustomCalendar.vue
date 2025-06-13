@@ -1,8 +1,5 @@
 <script lang="ts">
 import { ref } from "vue";
-import ExerciseSection from "../components/ExerciseSection.vue";
-import CustomCalendar from "../components/CustomCalendar.vue";
-import DashboardCard from "../components/DashboardCard.vue";
 
 const getCalendarDates = ({ month, year }: { month: number; year: number }) => {
   const today = new Date();
@@ -18,12 +15,9 @@ const getCalendarDates = ({ month, year }: { month: number; year: number }) => {
 
   return dateList;
 };
+
 export default {
-  components: {
-    ExerciseSection,
-    CustomCalendar,
-    DashboardCard,
-  },
+  name: "CustomCalendar",
   setup() {
     const exData = [
       "2025-06-13",
@@ -82,56 +76,12 @@ export default {
 };
 </script>
 <template>
-  <div class="home-container">
-    <h1>Home</h1>
-    <div class="content-container">
-      <div class="left-container">
-        <div class="calendar-container">
-          <CustomCalendar />
-        </div>
-        <div>
-          <DashboardCard />
-        </div>
-      </div>
-      <div class="exercise-section">
-        <ExerciseSection />
-      </div>
-    </div>
-  </div>
+  <VCalendar
+    borderless
+    transparent
+    expanded
+    title-position="left"
+    show-weeknumbers="right"
+    :attributes="attributes"
+  />
 </template>
-
-<style scoped>
-.home-container {
-  display: flex;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  min-height: 100vh;
-  height: 100%;
-  flex-direction: column;
-}
-.left-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.calendar-container {
-  border-style: solid;
-  border-width: 2px;
-  height: fit-content;
-  padding: 1rem;
-  width: 600px;
-}
-.content-container {
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-  height: 100%;
-  flex: 1;
-}
-.exercise-section {
-  border-width: 2px;
-  border-style: solid;
-  flex: 1;
-  margin-bottom: 2rem;
-}
-</style>

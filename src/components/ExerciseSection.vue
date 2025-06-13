@@ -1,11 +1,11 @@
 <script lang="ts">
 import { Add12Filled } from "@vicons/fluent";
 import { defineComponent, ref } from "vue";
-import ExerciseForm from "../components/ExerciseForm.vue";
-import ExerciseCard from "../components/ExerciseCard.vue";
+import ExerciseForm from "./ExerciseForm.vue";
+import ExerciseCard from "./ExerciseCard.vue";
 
 export default defineComponent({
-  name: "Exercises",
+  name: " ExerciseSection",
   components: {
     Add12Filled,
     ExerciseForm,
@@ -42,10 +42,9 @@ export default defineComponent({
   },
 });
 </script>
-
 <template>
-  <ExerciseForm v-model="isOpen" />
-  <div class="container">
+  <div class="exercise-container">
+    <ExerciseForm v-model="isOpen" />
     <div class="e-container">
       <div class="heading-container">
         <div>
@@ -63,9 +62,6 @@ export default defineComponent({
         <ul>
           <li v-for="(exercise, index) in exercises" :key="exercise.id">
             <ExerciseCard :exercise="exercise" />
-            <!-- <h4>{{ exercise.name }}</h4>
-            <p><span>Intensity: </span> {{ exercise.intensity }}</p>
-            <p><span>Duration: </span> {{ exercise.intensity }} minutes</p> -->
             <hr
               v-if="index < exercises.length - 1"
               style="border: none; height: 1px; background-color: #e0e0e0"
@@ -78,17 +74,13 @@ export default defineComponent({
 </template>
 
 <style scoped>
-.container {
+.exercise-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 2rem;
+  width: 100%;
+  height: 100%;
 }
 .e-container {
-  max-width: 400px;
   width: 100%;
-  border: "black";
-  border-style: solid;
   padding: 2.5rem;
 }
 .heading-container {
@@ -99,7 +91,7 @@ export default defineComponent({
 .title {
   padding: 0;
   margin: 0;
-  line-height: 10px;
+  line-height: 20px;
   /* text-align: center; */
 }
 .date {

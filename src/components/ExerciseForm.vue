@@ -33,7 +33,6 @@ export default defineComponent({
       get: () => props.modelValue,
       set: (val) => emit("update:modelValue", val),
     });
-    console.log("show", show.value);
     const handleClose = () => {
       emit("update:modelValue", false);
     };
