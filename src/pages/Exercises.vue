@@ -63,9 +63,6 @@ export default defineComponent({
         <ul>
           <li v-for="(exercise, index) in exercises" :key="exercise.id">
             <ExerciseCard :exercise="exercise" />
-            <!-- <h4>{{ exercise.name }}</h4>
-            <p><span>Intensity: </span> {{ exercise.intensity }}</p>
-            <p><span>Duration: </span> {{ exercise.intensity }} minutes</p> -->
             <hr
               v-if="index < exercises.length - 1"
               style="border: none; height: 1px; background-color: #e0e0e0"

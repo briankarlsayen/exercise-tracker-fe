@@ -8,10 +8,31 @@ import naive from "naive-ui";
 import VCalendar from "v-calendar";
 import "v-calendar/style.css";
 import "./style.css";
+import PrivateLayout from "./layouts/PrivateLayout.vue";
+import DefaultLayout from "./layouts/DefaultLayout.vue";
+
+import LoginPage from "./pages/Login.vue";
+import RegistrationPage from "./pages/Registration.vue";
+import ForgotPasswordPage from "./pages/ForgotPassword.vue";
 
 const routes = [
-  { path: "/", component: HomePage },
-  { path: "/exercises", component: ExercisesPage },
+  {
+    path: "/",
+    component: DefaultLayout,
+    children: [
+      { path: "/login", component: LoginPage },
+      { path: "/register", component: RegistrationPage },
+      { path: "/forgot-password", component: ForgotPasswordPage },
+    ],
+  },
+  {
+    path: "/app",
+    component: PrivateLayout,
+    children: [
+      { path: "/app/", component: HomePage },
+      { path: "/app/exercises", component: ExercisesPage },
+    ],
+  },
   { path: "/:catchAll(.*)", name: "not-found", component: NotfoundPage },
 ];
 

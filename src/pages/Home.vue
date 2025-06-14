@@ -74,23 +74,50 @@ export default {
     const combinedList = pastList.concat(exList);
     const attributes = ref(combinedList);
 
+    const card1 = {
+      cardType: "time",
+      cardValue: "224",
+    };
+    const card2 = {
+      cardType: "streak",
+      cardValue: "33",
+    };
+    const card3 = {
+      cardType: "progress",
+      cardValue: "3/5",
+    };
+
     return {
       exData,
       attributes,
+      card1,
+      card2,
+      card3,
     };
   },
 };
 </script>
 <template>
   <div class="home-container">
-    <h1>Home</h1>
     <div class="content-container">
       <div class="left-container">
         <div class="calendar-container">
           <CustomCalendar />
         </div>
-        <div>
-          <DashboardCard />
+        <h1>Weekly stats:</h1>
+        <div style="display: flex; gap: 1rem; justify-content: space-between">
+          <DashboardCard
+            :cardType="card1.cardType"
+            :cardVal="card1.cardValue"
+          />
+          <DashboardCard
+            :cardType="card2.cardType"
+            :cardVal="card2.cardValue"
+          />
+          <DashboardCard
+            :cardType="card3.cardType"
+            :cardVal="card3.cardValue"
+          />
         </div>
       </div>
       <div class="exercise-section">
@@ -103,11 +130,9 @@ export default {
 <style scoped>
 .home-container {
   display: flex;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  min-height: 100vh;
   height: 100%;
   flex-direction: column;
+  padding: 1rem;
 }
 .left-container {
   display: flex;
@@ -115,23 +140,22 @@ export default {
   gap: 1rem;
 }
 .calendar-container {
-  border-style: solid;
-  border-width: 2px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   height: fit-content;
   padding: 1rem;
   width: 600px;
 }
 .content-container {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   width: 100%;
   height: 100%;
   flex: 1;
 }
 .exercise-section {
-  border-width: 2px;
-  border-style: solid;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   flex: 1;
-  margin-bottom: 2rem;
 }
 </style>
