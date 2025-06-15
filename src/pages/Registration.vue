@@ -95,6 +95,7 @@ export default {
   <div class="container">
     <div class="form-container">
       <h1>Register</h1>
+      <br />
       <n-form
         ref="formRef"
         :model="field"
@@ -127,6 +128,8 @@ export default {
             v-model:value="field.password"
             @keydown.enter.prevent
             placeholder="Password"
+            type="password"
+            show-password-on="click"
           />
         </n-form-item>
         <n-form-item path="confirmPassword" label="Confirm Password">
@@ -134,15 +137,20 @@ export default {
             v-model:value="field.confirmPassword"
             @keydown.enter.prevent
             placeholder="Confirm Password"
+            type="password"
+            show-password-on="click"
           />
         </n-form-item>
         <div class="btn-container">
-          <n-button type="error" sumbit ghost @click="handleSubmit"
-            >Cancel</n-button
-          >
-          <n-button type="info" ghost @click="handleSubmit" attr-type="submit"
+          <n-button type="info" @click="handleSubmit" attr-type="submit"
             >Submit</n-button
           >
+        </div>
+        <div style="padding-top: 0.5rem">
+          <p>
+            You have an acount?
+            <RouterLink to="/login">Login</RouterLink>
+          </p>
         </div>
       </n-form>
     </div>
@@ -159,13 +167,12 @@ export default {
 }
 .form-container {
   width: 500px;
-  border-width: 2px;
-  border-style: solid;
-  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
 }
-
 .btn-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
 }
 </style>

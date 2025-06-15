@@ -3,36 +3,18 @@ import type { FormRules, FormItemRule } from "naive-ui";
 import { ref } from "vue";
 
 interface ModelType {
-  firstName: string;
-  lastName: string;
   email: string;
   password: string;
-  confirmPassword: string;
 }
 
 export default {
   setup() {
     const fieldRef = ref<ModelType>({
-      firstName: "",
-      lastName: "",
       email: "",
       password: "",
-      confirmPassword: "",
     });
 
     const rules: FormRules = {
-      firstName: [
-        {
-          required: true,
-          trigger: ["input", "blur"],
-        },
-      ],
-      lastName: [
-        {
-          required: true,
-          trigger: ["input", "blur"],
-        },
-      ],
       email: [
         {
           required: true,
@@ -67,19 +49,12 @@ export default {
           trigger: ["input", "blur"],
         },
       ],
-      confirmPassword: [
-        {
-          required: true,
-          trigger: ["input", "blur"],
-          validator(rule: FormItemRule, value: string) {
-            if (value === fieldRef.value.password) return true;
-            return false;
-          },
-        },
-      ],
     };
 
-    const handleSubmit = () => {};
+    const handleSubmit = () => {
+      // TODO handle login api
+      console.log("form", fieldRef.value);
+    };
 
     return {
       field: fieldRef,
@@ -93,26 +68,51 @@ export default {
   <div class="container">
     <div class="form-container">
       <h1>Login</h1>
+      <br />
       <n-form
         ref="formRef"
         :model="field"
         :rules="rules"
         @submit.prevent="handleSubmit"
       >
-        <n-form-item path="firstName" label="First Name">
+        <n-form-item path="email" label="Email">
           <n-input
-            v-model:value="field.firstName"
+            v-model:value="field.email"
             @keydown.enter.prevent
-            placeholder="First Name"
+            placeholder="Email"
           />
         </n-form-item>
-        <n-form-item path="firstName" label="First Name">
+        <n-form-item path="password" label="Password">
           <n-input
-            v-model:value="field.firstName"
+            v-model:value="field.password"
             @keydown.enter.prevent
-            placeholder="First Name"
+            placeholder="Password"
+            type="password"
+            show-password-on="click"
           />
         </n-form-item>
+        <div
+          style="
+            display: flex;
+            flex-direction: row-reverse;
+            padding-bottom: 1rem;
+          "
+        >
+          <p>
+            <RouterLink to="/forgot-password">Forgot Password?</RouterLink>
+          </p>
+        </div>
+        <div class="btn-container">
+          <n-button type="info" @click="handleSubmit" attr-type="submit"
+            >Submit</n-button
+          >
+        </div>
+        <div style="padding-top: 0.5rem">
+          <p>
+            You don't have an acount?
+            <RouterLink to="/register">Register</RouterLink>
+          </p>
+        </div>
       </n-form>
     </div>
   </div>
@@ -128,8 +128,12 @@ export default {
 }
 .form-container {
   width: 500px;
-  border-width: 2px;
-  border-style: solid;
-  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+}
+.btn-container {
+  display: flex;
+  flex-direction: column;
 }
 </style>
