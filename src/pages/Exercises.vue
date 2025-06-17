@@ -3,6 +3,7 @@ import { Add12Filled } from "@vicons/fluent";
 import { defineComponent, ref } from "vue";
 import ExerciseForm from "../components/ExerciseForm.vue";
 import ExerciseCard from "../components/ExerciseCard.vue";
+import { getExercises } from "../api/api";
 
 export default defineComponent({
   name: "Exercises",

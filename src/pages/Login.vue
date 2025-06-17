@@ -1,38 +1,37 @@
 <script lang="ts">
 import type { FormRules, FormItemRule } from "naive-ui";
 import { ref } from "vue";
+import { loginApi } from "../api/api";
+import { useRouter } from "vue-router";
 
 interface ModelType {
-  email: string;
+  username: string;
   password: string;
 }
 
 export default {
   setup() {
-    const fieldRef = ref<ModelType>({
-      email: "",
+    const router = useRouter();
+    const loading = ref(false);
+    const errorMsg = ref();
+    const field = ref<ModelType>({
+      username: "",
       password: "",
     });
 
+    const fieldRef = ref();
+
     const rules: FormRules = {
-      email: [
+      username: [
         {
           required: true,
-          validator(rule: FormItemRule, value: string) {
-            if (!value) return false;
-            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-              return new Error("Invalid email");
-            }
-            return true;
-          },
           trigger: ["input", "blur"],
         },
       ],
       password: [
         {
-          required: true,
           validator(rule: FormItemRule, value: string) {
-            if (!value) return true;
+            if (!value) return new Error("password is required");
             else if (!/.{8,}/.test(value)) {
               return new Error("Should be 8 characters long");
             } else if (!/(?=.*[a-z])/.test(value)) {
@@ -46,20 +45,42 @@ export default {
             }
             return true;
           },
+          required: true,
+
           trigger: ["input", "blur"],
         },
       ],
     };
 
-    const handleSubmit = () => {
-      // TODO handle login api
-      console.log("form", fieldRef.value);
+    const handleSubmit = async () => {
+      try {
+        loading.value = true;
+        await fieldRef.value?.validate((errors: any) => {
+          if (errors) {
+            return errors;
+          }
+        });
+        const res = await loginApi(field.value);
+        loading.value = false;
+        if (res?.success) {
+          errorMsg.value = null;
+          localStorage.setItem("auth", res?.data?.auth_token);
+          return router.push("/app/");
+        } else if (res?.non_field_errors[0]) {
+          return (errorMsg.value = res?.non_field_errors[0]);
+        }
+        return (errorMsg.value = "Error encountered, Please try again");
+      } catch (error) {
+        loading.value = false;
+      }
     };
 
     return {
-      field: fieldRef,
+      field,
+      fieldRef,
       rules,
       handleSubmit,
+      errorMsg,
     };
   },
 };
@@ -70,16 +91,17 @@ export default {
       <h1>Login</h1>
       <br />
       <n-form
-        ref="formRef"
+        ref="fieldRef"
         :model="field"
         :rules="rules"
         @submit.prevent="handleSubmit"
       >
-        <n-form-item path="email" label="Email">
+        <n-form-item path="username" label="Username">
           <n-input
-            v-model:value="field.email"
+            v-model:value="field.username"
             @keydown.enter.prevent
-            placeholder="Email"
+            placeholder="Username"
+            :on-input="() => (errorMsg = null)"
           />
         </n-form-item>
         <n-form-item path="password" label="Password">
@@ -91,6 +113,7 @@ export default {
             show-password-on="click"
           />
         </n-form-item>
+        <p v-if="errorMsg" class="error-text">{{ errorMsg }}</p>
         <div
           style="
             display: flex;

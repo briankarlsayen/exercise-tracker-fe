@@ -1,8 +1,23 @@
 <script lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import ExerciseSection from "../components/ExerciseSection.vue";
 import CustomCalendar from "../components/CustomCalendar.vue";
 import DashboardCard from "../components/DashboardCard.vue";
+import { getExercises } from "../api/api";
+import { formatDate } from "../utils";
+
+export interface IExerciseDetails {
+  date: string;
+  exercises: IExercise[];
+}
+
+export interface IExercise {
+  id: number;
+  name: string;
+  intensity?: number;
+  duration?: number;
+  category?: string;
+}
 
 const getCalendarDates = ({ month, year }: { month: number; year: number }) => {
   const today = new Date();
@@ -18,7 +33,9 @@ const getCalendarDates = ({ month, year }: { month: number; year: number }) => {
 
   return dateList;
 };
+
 export default {
+  name: "Homepage",
   components: {
     ExerciseSection,
     CustomCalendar,
@@ -87,12 +104,34 @@ export default {
       cardValue: "3/5",
     };
 
+    const exerciseData = ref<IExerciseDetails>({
+      date: "",
+      exercises: [],
+    });
+
+    onMounted(async () => {
+      try {
+        const currDate = formatDate(new Date());
+        const res = await getExercises(`?created_at=${currDate}`);
+
+        if (res?.success) {
+          exerciseData.value = {
+            date: currDate,
+            exercises: res.data,
+          };
+        }
+      } catch (error) {
+        console.log("error: ", error);
+      }
+    });
+
     return {
       exData,
       attributes,
       card1,
       card2,
       card3,
+      exerciseData,
     };
   },
 };
@@ -121,7 +160,10 @@ export default {
         </div>
       </div>
       <div class="exercise-section">
-        <ExerciseSection />
+        <ExerciseSection
+          :date="exerciseData.date"
+          :exercises="exerciseData.exercises"
+        />
       </div>
     </div>
   </div>

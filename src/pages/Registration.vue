@@ -1,10 +1,12 @@
 <script lang="ts">
 import type { FormRules, FormItemRule } from "naive-ui";
 import { ref } from "vue";
+import { registerApi } from "../api/api";
 
 interface ModelType {
   firstName: string;
   lastName: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -12,22 +14,41 @@ interface ModelType {
 
 export default {
   setup() {
-    const fieldRef = ref<ModelType>({
+    const field = ref<ModelType>({
       firstName: "",
       lastName: "",
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
     });
+    const loading = ref(false);
+    const errorMsg = ref();
+    const successMsg = ref(false);
+
+    const fieldRef = ref();
 
     const rules: FormRules = {
       firstName: [
         {
           required: true,
           trigger: ["input", "blur"],
+
+          renderMessage() {
+            return "first name is required";
+          },
         },
       ],
       lastName: [
+        {
+          required: true,
+          trigger: ["input", "blur"],
+          renderMessage() {
+            return "last name is required";
+          },
+        },
+      ],
+      username: [
         {
           required: true,
           trigger: ["input", "blur"],
@@ -37,7 +58,7 @@ export default {
         {
           required: true,
           validator(rule: FormItemRule, value: string) {
-            if (!value) return false;
+            if (!value) return new Error("email is required");
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
               return new Error("Invalid email");
             }
@@ -50,7 +71,7 @@ export default {
         {
           required: true,
           validator(rule: FormItemRule, value: string) {
-            if (!value) return true;
+            if (!value) return new Error("password is required");
             else if (!/.{8,}/.test(value)) {
               return new Error("Should be 8 characters long");
             } else if (!/(?=.*[a-z])/.test(value)) {
@@ -72,21 +93,73 @@ export default {
           required: true,
           trigger: ["input", "blur"],
           validator(rule: FormItemRule, value: string) {
-            if (value === fieldRef.value.password) return true;
-            return false;
+            if (!value) return new Error("Confirm password is required");
+            else if (value === field.value.password) return true;
+            return new Error("Should be the same with password");
           },
         },
       ],
     };
 
-    const handleSubmit = () => {
-      alert("weee!");
+    const handleSubmit = async () => {
+      try {
+        loading.value = true;
+        await fieldRef.value?.validate((errors: any) => {
+          if (errors) {
+            return errors;
+          }
+        });
+
+        const formVal = {
+          ...field.value,
+          first_name: field.value.firstName,
+          last_name: field.value.lastName,
+        };
+        const res = await registerApi(formVal);
+        loading.value = false;
+        if (res?.success) {
+          errorMsg.value = null;
+          successMsg.value = true;
+          return clearForm();
+        } else if (res?.non_field_errors?.[0]) {
+          return (errorMsg.value = res?.non_field_errors?.[0]);
+        } else if (res?.username) {
+          return (errorMsg.value = res?.username?.[0]);
+        } else if (res?.[0]) {
+          return (errorMsg.value = res?.[0]);
+        }
+
+        return (errorMsg.value = "Error encountered, Please try again");
+      } catch (error) {
+        loading.value = false;
+      }
+    };
+    const clearMessages = () => {
+      errorMsg.value = null;
+      successMsg.value = false;
+    };
+    const clearForm = () => {
+      field.value = {
+        firstName: "",
+        lastName: "",
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      };
+
+      fieldRef.value = null;
     };
 
     return {
-      field: fieldRef,
+      fieldRef,
+      field,
       rules,
       handleSubmit,
+      loading,
+      errorMsg,
+      successMsg,
+      clearMessages,
     };
   },
 };
@@ -97,7 +170,7 @@ export default {
       <h1>Register</h1>
       <br />
       <n-form
-        ref="formRef"
+        ref="fieldRef"
         :model="field"
         :rules="rules"
         @submit.prevent="handleSubmit"
@@ -107,6 +180,7 @@ export default {
             v-model:value="field.firstName"
             @keydown.enter.prevent
             placeholder="First Name"
+            :on-input="clearMessages"
           />
         </n-form-item>
         <n-form-item path="lastName" label="Last Name">
@@ -114,6 +188,15 @@ export default {
             v-model:value="field.lastName"
             @keydown.enter.prevent
             placeholder="Last Name"
+            :on-input="clearMessages"
+          />
+        </n-form-item>
+        <n-form-item path="username" label="Username">
+          <n-input
+            v-model:value="field.username"
+            @keydown.enter.prevent
+            placeholder="Username"
+            :on-input="clearMessages"
           />
         </n-form-item>
         <n-form-item path="email" label="Email">
@@ -121,6 +204,7 @@ export default {
             v-model:value="field.email"
             @keydown.enter.prevent
             placeholder="Email"
+            :on-input="clearMessages"
           />
         </n-form-item>
         <n-form-item path="password" label="Password">
@@ -130,6 +214,7 @@ export default {
             placeholder="Password"
             type="password"
             show-password-on="click"
+            :on-input="clearMessages"
           />
         </n-form-item>
         <n-form-item path="confirmPassword" label="Confirm Password">
@@ -139,13 +224,23 @@ export default {
             placeholder="Confirm Password"
             type="password"
             show-password-on="click"
+            :on-input="clearMessages"
           />
         </n-form-item>
+        <p v-if="errorMsg" class="error-text">{{ errorMsg }}</p>
+        <p v-else-if="successMsg" class="success-text">
+          Account Successfully created
+        </p>
         <div class="btn-container">
-          <n-button type="info" @click="handleSubmit" attr-type="submit"
+          <n-button
+            type="info"
+            attr-type="submit"
+            :loading="loading"
+            icon-placement="left"
             >Submit</n-button
           >
         </div>
+
         <div style="padding-top: 0.5rem">
           <p>
             You have an acount?
@@ -172,6 +267,8 @@ export default {
   padding: 1.5rem;
 }
 .btn-container {
+  padding-top: 0.5rem;
+
   display: flex;
   flex-direction: column;
 }

@@ -1,13 +1,14 @@
 <script lang="ts">
 import { Subtract12Filled } from "@vicons/fluent";
 import type { FormRules, FormItemRule } from "naive-ui";
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
+import CustomButton from "./CustomButton.vue";
+import { createExercise, getCategories } from "../api/api";
 
 interface ModelType {
-  name?: string;
-  intensity: number | null;
-  duration: number | null;
-  date: string | null;
+  name: string;
+  intensity?: number;
+  duration?: number;
   category?: number;
 }
 
@@ -15,6 +16,7 @@ export default defineComponent({
   name: "ExerciseForm",
   components: {
     Subtract12Filled,
+    CustomButton,
   },
   model: {
     prop: "isOpen",
@@ -26,6 +28,7 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    date: String,
   },
   emits: ["update:modelValue"],
   setup(props, { emit }) {
@@ -33,15 +36,19 @@ export default defineComponent({
       get: () => props.modelValue,
       set: (val) => emit("update:modelValue", val),
     });
+    const loading = ref(false);
+    const categoryList = ref([]);
+    const errorMsg = ref();
+
     const handleClose = () => {
       emit("update:modelValue", false);
     };
 
-    const fieldRef = ref<ModelType>({
-      intensity: null,
-      duration: null,
-      date: null,
+    const field = ref<ModelType>({
+      name: "",
     });
+
+    const fieldRef = ref();
 
     const rules: FormRules = {
       name: [
@@ -76,24 +83,78 @@ export default defineComponent({
           trigger: ["input", "blur"],
         },
       ],
-      date: [
+      category: [
         {
-          trigger: ["input", "blur"],
+          required: true,
+          trigger: ["change", "blur"],
+          type: "number",
         },
       ],
     };
 
-    const handleSubmit = () => {
-      console.log("submit");
+    // TODO reload get api
+    const handleSubmit = async () => {
+      try {
+        loading.value = true;
+
+        const exerciseFields = {
+          ...field?.value,
+          created_at: props.date ?? "",
+        };
+
+        await fieldRef.value?.validate((errors: any) => {
+          if (errors) {
+            return errors;
+          }
+        });
+
+        const createExerciseRes = await createExercise(exerciseFields);
+        loading.value = false;
+        if (createExerciseRes?.success) {
+          return clearForm();
+        }
+        return (errorMsg.value = "Error encountered, Please try again");
+      } catch (error) {
+        loading.value = false;
+        console.log("create exercise err", error);
+      }
+    };
+
+    const clearForm = () => {
+      field.value = {
+        name: "",
+      };
+      fieldRef.value = null;
       handleClose();
     };
 
+    onMounted(async () => {
+      try {
+        const res = await getCategories();
+        if (res?.success && res?.data) {
+          categoryList.value = res?.data?.map((category: any) => {
+            return {
+              label: category?.name,
+              value: category?.id,
+            };
+          });
+        }
+        console.log("get categories", res);
+      } catch (error) {
+        console.log("error get categories", error);
+      }
+    });
+
     return {
       show,
-      field: fieldRef,
+      field,
+      fieldRef,
       rules,
       handleClose,
       handleSubmit,
+      loading,
+      categoryList,
+      errorMsg,
     };
   },
 });
@@ -109,7 +170,7 @@ export default defineComponent({
       aria-modal="true"
     >
       <n-form
-        ref="formRef"
+        ref="fieldRef"
         :model="field"
         :rules="rules"
         @submit.prevent="handleSubmit"
@@ -135,18 +196,24 @@ export default defineComponent({
             placeholder="minutes"
           />
         </n-form-item>
-        <n-form-item path="date" label="Date">
-          <n-input
-            v-model:value="field.date"
+        <n-form-item path="category" label="Category">
+          <n-select
+            v-model:value="field.category"
+            :options="categoryList"
             @keydown.enter.prevent
-            placeholder="date"
           />
         </n-form-item>
+        <p>{{ errorMsg }}</p>
         <div class="btn-container">
           <n-button type="error" sumbit ghost @click="handleClose"
             >Cancel</n-button
           >
-          <n-button type="info" ghost @click="handleSubmit" attr-type="submit"
+          <n-button
+            type="info"
+            ghost
+            attr-type="submit"
+            :loading="loading"
+            icon-placement="left"
             >Save</n-button
           >
         </div>
@@ -164,5 +231,6 @@ export default defineComponent({
 .btn-container {
   display: flex;
   justify-content: space-between;
+  padding-top: 0.5rem;
 }
 </style>

@@ -1,8 +1,9 @@
 <script lang="ts">
 import { Add12Filled } from "@vicons/fluent";
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, type PropType } from "vue";
 import ExerciseForm from "./ExerciseForm.vue";
 import ExerciseCard from "./ExerciseCard.vue";
+import type { IExercise } from "../pages/Home.vue";
 
 export default defineComponent({
   name: " ExerciseSection",
@@ -11,32 +12,19 @@ export default defineComponent({
     ExerciseForm,
     ExerciseCard,
   },
+  props: {
+    date: {
+      type: String,
+      required: true,
+    },
+    exercises: {
+      type: Array as PropType<IExercise[]>,
+      default: [],
+    },
+  },
   setup() {
-    const date = "2025-06-11";
-    const exercises = [
-      {
-        id: 1,
-        name: "Bicept curls",
-        intensity: 5,
-        duration: 30,
-      },
-      {
-        id: 2,
-        name: "Concentration curl",
-        intensity: 7,
-        duration: 33,
-      },
-      {
-        id: 3,
-        name: "Hammer curl",
-        intensity: 7,
-        duration: 22,
-      },
-    ];
     const isOpen = ref(false);
     return {
-      exercises,
-      date,
       isOpen,
     };
   },
@@ -44,7 +32,7 @@ export default defineComponent({
 </script>
 <template>
   <div class="exercise-container">
-    <ExerciseForm v-model="isOpen" />
+    <ExerciseForm v-model="isOpen" :date="date" />
     <div class="e-container">
       <div class="heading-container">
         <div>
@@ -60,10 +48,10 @@ export default defineComponent({
       </div>
       <div>
         <ul>
-          <li v-for="(exercise, index) in exercises" :key="exercise.id">
+          <li v-for="(exercise, index) in exercises" :key="exercise?.id">
             <ExerciseCard :exercise="exercise" />
             <hr
-              v-if="index < exercises.length - 1"
+              v-if="index < exercises?.length - 1"
               style="border: none; height: 1px; background-color: #e0e0e0"
             />
           </li>
