@@ -14,6 +14,7 @@ import DefaultLayout from "./layouts/DefaultLayout.vue";
 import LoginPage from "./pages/Login.vue";
 import RegistrationPage from "./pages/Registration.vue";
 import ForgotPasswordPage from "./pages/ForgotPassword.vue";
+import { createPinia } from "pinia";
 
 const routes = [
   {
@@ -51,6 +52,7 @@ const router = createRouter({
 });
 
 const app = createApp(App);
+app.use(createPinia());
 app.use(naive);
 app.use(router);
 app.use(VCalendar, {});

@@ -60,3 +60,14 @@ export const routeUpdateApi = async ({ apiRoute, params }: PutApiProps) => {
     return error?.response?.data;
   }
 };
+
+export const routeDeleteApi = async ({ apiRoute }: GetApiProps) => {
+  try {
+    const headers = { Authorization: await getHeader() };
+
+    const response = await instance.delete(apiRoute, { headers });
+    return { ...response, success: true };
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};

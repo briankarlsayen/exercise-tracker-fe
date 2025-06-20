@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Add12Filled } from "@vicons/fluent";
-import { defineComponent, ref, type PropType } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import ExerciseForm from "./ExerciseForm.vue";
 import ExerciseCard from "./ExerciseCard.vue";
-import type { IExercise } from "../pages/Home.vue";
+import { useExerciseStore } from "../stores/exerciseStore";
 
 export default defineComponent({
   name: " ExerciseSection",
@@ -12,20 +12,23 @@ export default defineComponent({
     ExerciseForm,
     ExerciseCard,
   },
-  props: {
-    date: {
-      type: String,
-      required: true,
-    },
-    exercises: {
-      type: Array as PropType<IExercise[]>,
-      default: [],
-    },
-  },
   setup() {
+    const exerciseStore = useExerciseStore();
     const isOpen = ref(false);
+
+    const date = computed(() => exerciseStore.date);
+    const exercises = computed(() => exerciseStore.exercises);
+
+    const openExerciseForm = () => {
+      isOpen.value = true;
+      exerciseStore.addExercise();
+    };
+
     return {
       isOpen,
+      openExerciseForm,
+      date,
+      exercises,
     };
   },
 });
@@ -39,7 +42,7 @@ export default defineComponent({
           <h1 class="title">Exercises</h1>
           <p class="date">{{ date }}</p>
         </div>
-        <n-button type="info" @click="isOpen = true" ghost>
+        <n-button type="info" @click="openExerciseForm">
           <n-icon size="18">
             <Add12Filled />
           </n-icon>
@@ -49,7 +52,7 @@ export default defineComponent({
       <div>
         <ul>
           <li v-for="(exercise, index) in exercises" :key="exercise?.id">
-            <ExerciseCard :exercise="exercise" />
+            <ExerciseCard v-model="isOpen" :exercise="exercise" />
             <hr
               v-if="index < exercises?.length - 1"
               style="border: none; height: 1px; background-color: #e0e0e0"

@@ -1,10 +1,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <n-modal-provider>
-    <content />
-  </n-modal-provider>
   <main>
-    <router-view> </router-view>
+    <n-dialog-provider>
+      <router-view> </router-view>
+    </n-dialog-provider>
   </main>
 </template>

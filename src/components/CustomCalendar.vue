@@ -1,75 +1,69 @@
 <script lang="ts">
-import { ref } from "vue";
-
-const getCalendarDates = ({ month, year }: { month: number; year: number }) => {
-  const today = new Date();
-  const dateList = [];
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const currentDate = new Date(year, month - 1, day + 1);
-    if (currentDate < today) {
-      dateList.push(currentDate.toISOString().split("T")[0]); // format: YYYY-MM-DD
-    }
-  }
-
-  return dateList;
-};
+import { onMounted, ref } from "vue";
+import { getCalendarExercises } from "../api/api";
+import { useExerciseStore } from "../stores/exerciseStore";
+import { formatDate } from "../utils";
 
 export default {
   name: "CustomCalendar",
   setup() {
-    const exData = [
-      "2025-06-13",
-      "2025-06-11",
-      "2025-06-12",
-      "2025-06-06",
-      "2025-06-01",
-    ];
-    const calendarMonth = ref(6);
-    const calendarYear = ref(2025);
+    const attributes = ref();
+    const calendar = ref(null) as any;
+    const store = useExerciseStore();
 
-    const dateList = getCalendarDates({
-      month: calendarMonth?.value,
-      year: calendarYear?.value,
-    });
+    const move = async (params: any) => {
+      const { month, year } = params[0];
+      await getCalendarDates({ month, year });
+    };
 
-    const exList = exData.map((e) => {
-      const convertDate = new Date(e);
-      const year = convertDate.getFullYear();
-      const month = convertDate.getMonth();
-      const day = convertDate.getDate();
-
-      const data = {
-        highlight: {
+    const formatCalendar = (list: any[]) => {
+      return list?.map((exercise: any) => {
+        const doneHighlight = {
           color: "green",
           fillMode: "solid",
-        },
-        dates: new Date(year, month, day),
-      };
-      return data;
-    });
-    const pastList = dateList.map((e) => {
-      const convertDate = new Date(e);
-      const year = convertDate.getFullYear();
-      const month = convertDate.getMonth();
-      const day = convertDate.getDate();
-
-      const data = {
-        highlight: {
+        };
+        const emptyHighlist = {
           color: "gray",
           fillMode: "outline",
-        },
+        };
 
-        dates: new Date(year, month, day),
-      };
-      return data;
+        return {
+          highlight: exercise?.isDone ? doneHighlight : emptyHighlist,
+          dates: new Date(exercise?.date).toISOString().split("T")[0],
+        };
+      });
+    };
+
+    const getCalendarDates = async ({ month, year }: any) => {
+      try {
+        const res = await getCalendarExercises({ month, year });
+        if (res?.success) {
+          const res1 = formatCalendar(res?.data?.calendar_dates);
+          attributes.value = res1;
+        }
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+    onMounted(async () => {
+      const today = new Date();
+      const month = today.getMonth() + 1;
+      const year = today.getFullYear();
+      await getCalendarDates({ month, year });
     });
-    const combinedList = pastList.concat(exList);
-    const attributes = ref(combinedList);
+
+    const calendarDateClick = async (params: any) => {
+      const { day, month, year } = params;
+      const date = formatDate(new Date(year, month, day));
+
+      await store.fetchExercises(date);
+    };
 
     return {
-      exData,
+      move,
+      calendarDateClick,
+      calendar,
       attributes,
     };
   },
@@ -77,11 +71,15 @@ export default {
 </script>
 <template>
   <VCalendar
+    @did-move="move"
+    @dayclick="calendarDateClick"
+    ref="calendar"
     borderless
     transparent
     expanded
     title-position="left"
     show-weeknumbers="right"
     :attributes="attributes"
+    :first-day-of-week="2"
   />
 </template>

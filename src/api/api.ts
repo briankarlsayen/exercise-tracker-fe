@@ -1,11 +1,12 @@
-import { routeGetApi, routePostApi } from ".";
+import { routeDeleteApi, routeGetApi, routePostApi, routeUpdateApi } from ".";
+import type { IExerciseField } from "../stores/exerciseStore";
 
-interface ICreateExercise {
-  name: string;
-  category?: number;
-  duration?: number;
-  intensity?: number;
-  created_at: string;
+interface ICreateExercise extends IExerciseField {
+  created_at?: string;
+}
+
+interface IUpdateExercise extends ICreateExercise {
+  id: number;
 }
 
 export const loginApi = async (params: any) => {
@@ -55,6 +56,43 @@ export const getCategories = async () => {
 
 export const createExercise = async (params: ICreateExercise) => {
   return await routePostApi({ apiRoute: "/exercises/create", params })
+    .then((res) => {
+      return res;
+    })
+    .catch((error) => {
+      return error;
+    });
+};
+
+export const updateExercise = async (params: IUpdateExercise) => {
+  return await routeUpdateApi({ apiRoute: `/exercises/${params?.id}/`, params })
+    .then((res) => {
+      return res;
+    })
+    .catch((error) => {
+      return error;
+    });
+};
+
+export const deleteExercise = async (id: number) => {
+  return await routeDeleteApi({ apiRoute: `/exercises/${id}/` })
+    .then((res) => {
+      return res;
+    })
+    .catch((error) => {
+      return error;
+    });
+};
+
+export const getCalendarExercises = async ({
+  month,
+  year,
+}: {
+  month: number;
+  year: number;
+}) => {
+  let route = `/exercises/calendar/?month=${month}&year=${year}`;
+  return await routeGetApi({ apiRoute: route })
     .then((res) => {
       return res;
     })

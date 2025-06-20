@@ -1,9 +1,9 @@
 <script lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import ExerciseSection from "../components/ExerciseSection.vue";
 import CustomCalendar from "../components/CustomCalendar.vue";
 import DashboardCard from "../components/DashboardCard.vue";
-import { getExercises } from "../api/api";
+import { useExerciseStore } from "../stores/exerciseStore";
 import { formatDate } from "../utils";
 
 export interface IExerciseDetails {
@@ -19,21 +19,6 @@ export interface IExercise {
   category?: string;
 }
 
-const getCalendarDates = ({ month, year }: { month: number; year: number }) => {
-  const today = new Date();
-  const dateList = [];
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const currentDate = new Date(year, month - 1, day + 1);
-    if (currentDate < today) {
-      dateList.push(currentDate.toISOString().split("T")[0]); // format: YYYY-MM-DD
-    }
-  }
-
-  return dateList;
-};
-
 export default {
   name: "Homepage",
   components: {
@@ -42,55 +27,6 @@ export default {
     DashboardCard,
   },
   setup() {
-    const exData = [
-      "2025-06-13",
-      "2025-06-11",
-      "2025-06-12",
-      "2025-06-06",
-      "2025-06-01",
-    ];
-    const calendarMonth = ref(6);
-    const calendarYear = ref(2025);
-
-    const dateList = getCalendarDates({
-      month: calendarMonth?.value,
-      year: calendarYear?.value,
-    });
-
-    const exList = exData.map((e) => {
-      const convertDate = new Date(e);
-      const year = convertDate.getFullYear();
-      const month = convertDate.getMonth();
-      const day = convertDate.getDate();
-
-      const data = {
-        highlight: {
-          color: "green",
-          fillMode: "solid",
-        },
-        dates: new Date(year, month, day),
-      };
-      return data;
-    });
-    const pastList = dateList.map((e) => {
-      const convertDate = new Date(e);
-      const year = convertDate.getFullYear();
-      const month = convertDate.getMonth();
-      const day = convertDate.getDate();
-
-      const data = {
-        highlight: {
-          color: "gray",
-          fillMode: "outline",
-        },
-
-        dates: new Date(year, month, day),
-      };
-      return data;
-    });
-    const combinedList = pastList.concat(exList);
-    const attributes = ref(combinedList);
-
     const card1 = {
       cardType: "time",
       cardValue: "224",
@@ -104,30 +40,18 @@ export default {
       cardValue: "3/5",
     };
 
-    const exerciseData = ref<IExerciseDetails>({
-      date: "",
-      exercises: [],
-    });
+    const exerciseData = useExerciseStore();
 
     onMounted(async () => {
-      try {
-        const currDate = formatDate(new Date());
-        const res = await getExercises(`?created_at=${currDate}`);
-
-        if (res?.success) {
-          exerciseData.value = {
-            date: currDate,
-            exercises: res.data,
-          };
-        }
-      } catch (error) {
-        console.log("error: ", error);
-      }
+      const today = new Date();
+      const day = today.getDate();
+      const month = today.getMonth() + 1;
+      const year = today.getFullYear();
+      const date = formatDate(new Date(year, month, day));
+      await exerciseData.fetchExercises(date);
     });
 
     return {
-      exData,
-      attributes,
       card1,
       card2,
       card3,
@@ -160,10 +84,7 @@ export default {
         </div>
       </div>
       <div class="exercise-section">
-        <ExerciseSection
-          :date="exerciseData.date"
-          :exercises="exerciseData.exercises"
-        />
+        <ExerciseSection />
       </div>
     </div>
   </div>

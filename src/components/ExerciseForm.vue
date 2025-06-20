@@ -1,16 +1,10 @@
 <script lang="ts">
 import { Subtract12Filled } from "@vicons/fluent";
 import type { FormRules, FormItemRule } from "naive-ui";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import CustomButton from "./CustomButton.vue";
-import { createExercise, getCategories } from "../api/api";
-
-interface ModelType {
-  name: string;
-  intensity?: number;
-  duration?: number;
-  category?: number;
-}
+import { createExercise, getCategories, updateExercise } from "../api/api";
+import { useExerciseStore, type IExercise } from "../stores/exerciseStore";
 
 export default defineComponent({
   name: "ExerciseForm",
@@ -32,10 +26,14 @@ export default defineComponent({
   },
   emits: ["update:modelValue"],
   setup(props, { emit }) {
+    const store = useExerciseStore();
     const show = computed({
       get: () => props.modelValue,
       set: (val) => emit("update:modelValue", val),
     });
+
+    const exerciseDate = computed(() => store.date);
+
     const loading = ref(false);
     const categoryList = ref([]);
     const errorMsg = ref();
@@ -44,7 +42,8 @@ export default defineComponent({
       emit("update:modelValue", false);
     };
 
-    const field = ref<ModelType>({
+    const field = ref<IExercise>({
+      id: 0,
       name: "",
     });
 
@@ -59,7 +58,7 @@ export default defineComponent({
       ],
       intensity: [
         {
-          validator(rule: FormItemRule, value: string) {
+          validator(_: FormItemRule, value: string) {
             if (!value) return true;
             else if (!/^\d*$/.test(value)) {
               return new Error("Age should be an integer");
@@ -73,7 +72,7 @@ export default defineComponent({
       ],
       duration: [
         {
-          validator(rule: FormItemRule, value: string) {
+          validator(_: FormItemRule, value: string) {
             if (!value) return true;
             else if (!/^\d*$/.test(value)) {
               return new Error("Age should be an integer");
@@ -99,6 +98,7 @@ export default defineComponent({
 
         const exerciseFields = {
           ...field?.value,
+          category: Number(field.value.category),
           created_at: props.date ?? "",
         };
 
@@ -108,11 +108,23 @@ export default defineComponent({
           }
         });
 
-        const createExerciseRes = await createExercise(exerciseFields);
-        loading.value = false;
-        if (createExerciseRes?.success) {
-          return clearForm();
+        // const currDate = formatDate(new Date());
+        if (store.form.type === "add") {
+          const createExerciseRes = await createExercise(exerciseFields);
+          loading.value = false;
+          if (createExerciseRes?.success) {
+            await store.fetchExercises(exerciseDate.value);
+            return clearForm();
+          }
+        } else {
+          const createExerciseRes = await updateExercise(exerciseFields);
+          loading.value = false;
+          if (createExerciseRes?.success) {
+            await store.fetchExercises(exerciseDate.value);
+            return clearForm();
+          }
         }
+
         return (errorMsg.value = "Error encountered, Please try again");
       } catch (error) {
         loading.value = false;
@@ -122,9 +134,11 @@ export default defineComponent({
 
     const clearForm = () => {
       field.value = {
+        id: 0,
         name: "",
       };
       fieldRef.value = null;
+      store.clearForm();
       handleClose();
     };
 
@@ -139,11 +153,20 @@ export default defineComponent({
             };
           });
         }
-        console.log("get categories", res);
       } catch (error) {
         console.log("error get categories", error);
       }
     });
+
+    watch(props, () => {
+      if (store.form.type === "edit") {
+        field.value = store?.form.field;
+      }
+    });
+
+    const getCardName = () => {
+      return store?.form?.type === "add" ? "Add Exercise" : "Edit Exercise";
+    };
 
     return {
       show,
@@ -155,15 +178,17 @@ export default defineComponent({
       loading,
       categoryList,
       errorMsg,
+      getCardName,
+      clearForm,
     };
   },
 });
 </script>
 <template>
-  <n-modal v-model:show="show">
+  <n-modal v-model:show="show" :on-after-leave="clearForm">
     <n-card
       style="width: 400px"
-      title="Add Exercise"
+      :title="getCardName()"
       :bordered="false"
       size="huge"
       role="dialog"
@@ -210,7 +235,6 @@ export default defineComponent({
           >
           <n-button
             type="info"
-            ghost
             attr-type="submit"
             :loading="loading"
             icon-placement="left"
