@@ -100,3 +100,14 @@ export const getCalendarExercises = async ({
       return error;
     });
 };
+
+export const getExerciseStats = async () => {
+  let route = "/exercises/stats";
+  return await routeGetApi({ apiRoute: route })
+    .then((res) => {
+      return res;
+    })
+    .catch((error) => {
+      return error;
+    });
+};

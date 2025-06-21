@@ -24,6 +24,25 @@ export default defineComponent({
       type: String,
     },
   },
+  methods: {
+    getPercentage() {
+      const val = this.$props.cardVal?.split("/");
+      console.log("hit", this.$props.cardVal);
+      const firstVal = val?.[0];
+      const secondVal = val?.[1];
+
+      if (firstVal && secondVal) {
+      }
+
+      const percentage =
+        firstVal && secondVal
+          ? (Number(firstVal) / Number(secondVal)) * 100
+          : "";
+
+      const fullVal = Number(percentage) > 100 ? 100 : percentage;
+      return fullVal ?? "";
+    },
+  },
 });
 </script>
 <template>
@@ -43,6 +62,7 @@ export default defineComponent({
     <div class="val-container">
       <h1>{{ cardVal }}</h1>
       <p class="subtitle">week streaks</p>
+      <p class="subtitle2">*4 exercise per week</p>
     </div>
   </div>
   <div v-else-if="cardType === 'progress'" class="popup-box">
@@ -52,7 +72,7 @@ export default defineComponent({
           style="width: 100px"
           id="progress2"
           type="line"
-          :percentage="60"
+          :percentage="getPercentage()"
           :indicator-placement="'inside'"
           processing
         />
@@ -109,5 +129,9 @@ h1 {
   flex: 1;
   align-items: center;
   align-content: center;
+}
+.subtitle2 {
+  font-size: 8px;
+  color: gray;
 }
 </style>

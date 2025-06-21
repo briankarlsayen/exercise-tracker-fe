@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import ExerciseSection from "../components/ExerciseSection.vue";
 import CustomCalendar from "../components/CustomCalendar.vue";
 import DashboardCard from "../components/DashboardCard.vue";
@@ -42,6 +42,11 @@ export default {
 
     const exerciseData = useExerciseStore();
 
+    const streak = computed(() => exerciseData?.stats?.streak);
+    const duration = computed(() => exerciseData?.stats?.duration);
+    const progress = computed(() => exerciseData?.stats.progress);
+    console.log("streak", streak);
+
     onMounted(async () => {
       const today = new Date();
       const day = today.getDate();
@@ -49,6 +54,7 @@ export default {
       const year = today.getFullYear();
       const date = formatDate(new Date(year, month, day));
       await exerciseData.fetchExercises(date);
+      await exerciseData.fetchExerciseStats();
     });
 
     return {
@@ -56,6 +62,11 @@ export default {
       card2,
       card3,
       exerciseData,
+      stats: {
+        streak: streak,
+        duration: duration,
+        progress: progress,
+      },
     };
   },
 };
@@ -71,15 +82,15 @@ export default {
         <div style="display: flex; gap: 1rem; justify-content: space-between">
           <DashboardCard
             :cardType="card1.cardType"
-            :cardVal="card1.cardValue"
+            :cardVal="stats.duration?.value"
           />
           <DashboardCard
             :cardType="card2.cardType"
-            :cardVal="card2.cardValue"
+            :cardVal="stats?.streak?.value"
           />
           <DashboardCard
             :cardType="card3.cardType"
-            :cardVal="card3.cardValue"
+            :cardVal="stats?.progress?.value"
           />
         </div>
       </div>

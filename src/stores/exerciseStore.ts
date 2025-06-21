@@ -1,5 +1,9 @@
 import { defineStore } from "pinia";
-import { getCalendarExercises, getExercises } from "../api/api";
+import {
+  getCalendarExercises,
+  getExercises,
+  getExerciseStats,
+} from "../api/api";
 
 export interface IExerciseField {
   name: string;
@@ -30,6 +34,11 @@ export const useExerciseStore = defineStore("exercises", {
       type: "add" as FormType,
       field: {} as IExercise,
     },
+    stats: {
+      duration: "",
+      streak: "",
+      progress: "",
+    },
     calendarExercises: [],
   }),
   actions: {
@@ -52,6 +61,21 @@ export const useExerciseStore = defineStore("exercises", {
 
         if (res?.success) {
           return res;
+        }
+      } catch (error) {
+        console.log("error: ", error);
+      }
+    },
+    async fetchExerciseStats() {
+      try {
+        const res = await getExerciseStats();
+
+        if (res?.success) {
+          this.stats = {
+            duration: res?.data?.exercises_duration,
+            streak: res?.data?.streak,
+            progress: res?.data?.exercise_days_done,
+          };
         }
       } catch (error) {
         console.log("error: ", error);
