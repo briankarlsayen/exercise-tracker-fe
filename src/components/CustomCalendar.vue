@@ -1,56 +1,25 @@
 <script lang="ts">
-import { onMounted, ref } from "vue";
-import { getCalendarExercises } from "../api/api";
+import { computed, onMounted, ref } from "vue";
 import { useExerciseStore } from "../stores/exerciseStore";
 import { formatDate } from "../utils";
 
 export default {
   name: "CustomCalendar",
   setup() {
-    const attributes = ref();
     const calendar = ref(null) as any;
     const store = useExerciseStore();
+    const attributes = computed(() => store.calendarAttributes);
 
     const move = async (params: any) => {
-      const { month, year } = params[0];
-      await getCalendarDates({ month, year });
-    };
-
-    const formatCalendar = (list: any[]) => {
-      return list?.map((exercise: any) => {
-        const doneHighlight = {
-          color: "green",
-          fillMode: "solid",
-        };
-        const emptyHighlist = {
-          color: "gray",
-          fillMode: "outline",
-        };
-
-        return {
-          highlight: exercise?.isDone ? doneHighlight : emptyHighlist,
-          dates: new Date(exercise?.date).toISOString().split("T")[0],
-        };
-      });
-    };
-
-    const getCalendarDates = async ({ month, year }: any) => {
-      try {
-        const res = await getCalendarExercises({ month, year });
-        if (res?.success) {
-          const res1 = formatCalendar(res?.data?.calendar_dates);
-          attributes.value = res1;
-        }
-      } catch (error) {
-        console.log("error", error);
-      }
+      const { month, year } = params?.[0];
+      await store.fetchCalendarExercises({ month, year });
     };
 
     onMounted(async () => {
       const today = new Date();
       const month = today.getMonth() + 1;
       const year = today.getFullYear();
-      await getCalendarDates({ month, year });
+      await store.fetchCalendarExercises({ month, year });
     });
 
     const calendarDateClick = async (params: any) => {
@@ -64,7 +33,7 @@ export default {
       move,
       calendarDateClick,
       calendar,
-      attributes,
+      attributes: attributes,
     };
   },
 };

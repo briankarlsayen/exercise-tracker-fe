@@ -11,10 +11,10 @@ TODO
 ------ [x] create
 ------ [x] update
 ------ [x] delete
-[ ] reports api
---- [ ] exercise total minutes this week
---- [ ] week streak, 4 exercise/week
---- [ ] days with exercise / 5
+[x] reports api
+--- [x] exercise total minutes this week
+--- [x] week streak, 4 exercise/week
+--- [x] days with exercise / 5
 
 NOTES
 
@@ -22,3 +22,6 @@ NOTES
 - im using OPTIONS API here
 - mobile responsiveness
 - "/" handling, if not user or not valid user then go to "/login/", else "/app/"
+
+BUGS
+[ ] if i created item calendar wont hot load

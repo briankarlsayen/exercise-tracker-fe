@@ -26,6 +26,25 @@ export interface IExercise {
   duration?: number;
   category?: string;
 }
+
+const formatCalendar = (list: any[]) => {
+  return list?.map((exercise: any) => {
+    const doneHighlight = {
+      color: "green",
+      fillMode: "solid",
+    };
+    const emptyHighlist = {
+      color: "gray",
+      fillMode: "outline",
+    };
+
+    return {
+      highlight: exercise?.isDone ? doneHighlight : emptyHighlist,
+      dates: new Date(exercise?.date).toISOString().split("T")[0],
+    };
+  });
+};
+
 export const useExerciseStore = defineStore("exercises", {
   state: () => ({
     exercises: [] as IExercise[],
@@ -34,6 +53,7 @@ export const useExerciseStore = defineStore("exercises", {
       type: "add" as FormType,
       field: {} as IExercise,
     },
+    calendarAttributes: [] as any[],
     stats: {
       duration: "",
       streak: "",
@@ -60,6 +80,7 @@ export const useExerciseStore = defineStore("exercises", {
         const res = await getCalendarExercises({ month, year });
 
         if (res?.success) {
+          this.calendarAttributes = formatCalendar(res?.data?.calendar_dates);
           return res;
         }
       } catch (error) {

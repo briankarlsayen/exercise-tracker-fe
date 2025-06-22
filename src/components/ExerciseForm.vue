@@ -108,12 +108,18 @@ export default defineComponent({
           }
         });
 
-        // const currDate = formatDate(new Date());
         if (store.form.type === "add") {
           const createExerciseRes = await createExercise(exerciseFields);
           loading.value = false;
+
+          const formDate = new Date(exerciseDate?.value);
+          const month = formDate.getMonth() + 1;
+          const year = formDate.getFullYear();
           if (createExerciseRes?.success) {
             await store.fetchExercises(exerciseDate.value);
+            await store.fetchCalendarExercises({ month, year });
+            await store.fetchExerciseStats();
+
             return clearForm();
           }
         } else {

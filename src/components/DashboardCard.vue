@@ -27,12 +27,8 @@ export default defineComponent({
   methods: {
     getPercentage() {
       const val = this.$props.cardVal?.split("/");
-      console.log("hit", this.$props.cardVal);
       const firstVal = val?.[0];
       const secondVal = val?.[1];
-
-      if (firstVal && secondVal) {
-      }
 
       const percentage =
         firstVal && secondVal
@@ -40,7 +36,18 @@ export default defineComponent({
           : "";
 
       const fullVal = Number(percentage) > 100 ? 100 : percentage;
-      return fullVal ?? "";
+      let status = "warning";
+      if (Number(fullVal) === 100) {
+        status = "success";
+      } else if (Number(fullVal) >= 50) {
+        status = "info";
+      } else {
+        status = "warning";
+      }
+      return {
+        percentage: fullVal ?? "",
+        status,
+      };
     },
   },
 });
@@ -72,9 +79,10 @@ export default defineComponent({
           style="width: 100px"
           id="progress2"
           type="line"
-          :percentage="getPercentage()"
+          :percentage="getPercentage()?.percentage"
           :indicator-placement="'inside'"
           processing
+          :status="getPercentage()?.status"
         />
       </n-space>
     </div>
