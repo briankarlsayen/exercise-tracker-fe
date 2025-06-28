@@ -1,16 +1,20 @@
 <script lang="ts">
 import { SignOut20Filled } from "@vicons/fluent";
 import { useRouter } from "vue-router";
+import Notfound from "../pages/Notfound.vue";
 
 export default {
   name: "PrivateLayout",
   components: {
     SignOut20Filled,
+    Notfound,
   },
   setup() {
     const router = useRouter();
+    const authExist = localStorage.getItem("auth");
 
     return {
+      authExist,
       logout: () => {
         localStorage.clear();
         router.push("/login");
@@ -21,7 +25,7 @@ export default {
 </script>
 
 <template>
-  <div class="container">
+  <div v-if="authExist" class="container">
     <nav>
       <div class="nav-logo">
         <h1>Exercise Tracker</h1>
@@ -31,6 +35,10 @@ export default {
       </n-icon>
     </nav>
     <router-view />
+  </div>
+  <div v-else>
+    <Notfound />
+    <!-- <p>eyy</p> -->
   </div>
 </template>
 

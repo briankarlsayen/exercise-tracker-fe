@@ -21,6 +21,13 @@ const routes = [
     path: "/",
     component: DefaultLayout,
     children: [
+      {
+        path: "/",
+        redirect: () => {
+          const authKey = localStorage.getItem("auth");
+          return { path: authKey ? "/app" : "/login" };
+        },
+      },
       { path: "/login", component: LoginPage },
       { path: "/register", component: RegistrationPage },
       { path: "/forgot-password", component: ForgotPasswordPage },
