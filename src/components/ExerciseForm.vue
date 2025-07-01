@@ -2,7 +2,6 @@
 import { Subtract12Filled } from "@vicons/fluent";
 import type { FormRules, FormItemRule } from "naive-ui";
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
-import CustomButton from "./CustomButton.vue";
 import { createExercise, getCategories, updateExercise } from "../api/api";
 import { useExerciseStore, type IExercise } from "../stores/exerciseStore";
 
@@ -10,7 +9,6 @@ export default defineComponent({
   name: "ExerciseForm",
   components: {
     Subtract12Filled,
-    CustomButton,
   },
   model: {
     prop: "isOpen",
