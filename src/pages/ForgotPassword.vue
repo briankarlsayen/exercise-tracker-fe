@@ -124,6 +124,8 @@ export default {
   align-items: center;
   height: 100vh;
   justify-content: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 .form-container {
   width: 500px;

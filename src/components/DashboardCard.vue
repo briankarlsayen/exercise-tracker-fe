@@ -100,7 +100,9 @@ export default defineComponent({
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  width: 180px;
+  /* width: 170px; */
+  width: 100%;
+  max-width: 180px;
   height: 220px;
   display: flex;
   flex-direction: column;

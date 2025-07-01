@@ -5,6 +5,7 @@ import CustomCalendar from "../components/CustomCalendar.vue";
 import DashboardCard from "../components/DashboardCard.vue";
 import { useExerciseStore } from "../stores/exerciseStore";
 import { formatDate } from "../utils";
+import DashboardScreen from "../components/DashboardScreen.vue";
 
 export interface IExerciseDetails {
   date: string;
@@ -25,6 +26,7 @@ export default {
     ExerciseSection,
     CustomCalendar,
     DashboardCard,
+    DashboardScreen,
   },
   setup() {
     const card1 = {
@@ -45,7 +47,6 @@ export default {
     const streak = computed(() => exerciseData?.stats?.streak);
     const duration = computed(() => exerciseData?.stats?.duration);
     const progress = computed(() => exerciseData?.stats.progress);
-    console.log("streak", streak);
 
     onMounted(async () => {
       const today = new Date();
@@ -74,29 +75,23 @@ export default {
 <template>
   <div class="home-container">
     <div class="content-container">
-      <div class="left-container">
-        <div class="calendar-container">
-          <CustomCalendar />
-        </div>
-        <h2>Weekly stats:</h2>
-        <div style="display: flex; gap: 1rem; justify-content: space-between">
-          <DashboardCard
-            :cardType="card1.cardType"
-            :cardVal="stats.duration?.value?.toString()"
-          />
-          <DashboardCard
-            :cardType="card2.cardType"
-            :cardVal="stats?.streak?.value?.toString()"
-          />
-          <DashboardCard
-            :cardType="card3.cardType"
-            :cardVal="stats?.progress?.value?.toString()"
-          />
-        </div>
-      </div>
-      <div class="exercise-section">
-        <ExerciseSection />
-      </div>
+      <n-grid cols="1 l:3" :y-gap="24" :x-gap="14" responsive="screen">
+        <n-grid-item>
+          <div class="left-container">
+            <div class="calendar-container">
+              <CustomCalendar />
+            </div>
+            <div>
+              <DashboardScreen />
+            </div>
+          </div>
+        </n-grid-item>
+        <n-grid-item :span="2">
+          <div class="exercise-section">
+            <ExerciseSection />
+          </div>
+        </n-grid-item>
+      </n-grid>
     </div>
   </div>
 </template>
@@ -112,13 +107,16 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
 }
 .calendar-container {
+  display: flex;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   height: fit-content;
   padding: 1rem;
-  width: 600px;
+  max-width: 600px;
+  width: 100%;
 }
 .content-container {
   display: flex;
@@ -131,5 +129,12 @@ export default {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   flex: 1;
+}
+
+/* Small screen: apply padding-bottom */
+@media (max-width: 640px) {
+  .exercise-section {
+    margin-bottom: 1rem;
+  }
 }
 </style>

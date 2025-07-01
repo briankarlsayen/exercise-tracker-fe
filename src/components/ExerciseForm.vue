@@ -190,9 +190,9 @@ export default defineComponent({
 });
 </script>
 <template>
-  <n-modal v-model:show="show" :on-after-leave="clearForm">
+  <n-modal v-model:show="show" :on-after-leave="clearForm" style="width: 100px">
     <n-card
-      style="width: 400px"
+      style="width: 90%; max-width: 400px"
       :title="getCardName()"
       :bordered="false"
       size="huge"
