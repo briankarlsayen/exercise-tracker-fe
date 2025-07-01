@@ -39,7 +39,7 @@ export default defineComponent({
     <div class="e-container">
       <div class="heading-container">
         <div>
-          <h1 class="title">Exercises</h1>
+          <h2 class="title">Exercises</h2>
           <p class="date">{{ date }}</p>
         </div>
         <n-button type="info" @click="openExerciseForm">

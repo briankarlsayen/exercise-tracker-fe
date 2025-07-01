@@ -28,7 +28,7 @@ export default {
   <div v-if="authExist" class="container">
     <nav>
       <div class="nav-logo">
-        <h1>Exercise Tracker</h1>
+        <h2>Exercise Tracker</h2>
       </div>
       <n-icon class="icon" size="24" @click="logout">
         <SignOut20Filled />

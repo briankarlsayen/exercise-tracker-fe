@@ -78,19 +78,19 @@ export default {
         <div class="calendar-container">
           <CustomCalendar />
         </div>
-        <h1>Weekly stats:</h1>
+        <h2>Weekly stats:</h2>
         <div style="display: flex; gap: 1rem; justify-content: space-between">
           <DashboardCard
             :cardType="card1.cardType"
-            :cardVal="stats.duration?.value"
+            :cardVal="stats.duration?.value?.toString()"
           />
           <DashboardCard
             :cardType="card2.cardType"
-            :cardVal="stats?.streak?.value"
+            :cardVal="stats?.streak?.value?.toString()"
           />
           <DashboardCard
             :cardType="card3.cardType"
-            :cardVal="stats?.progress?.value"
+            :cardVal="stats?.progress?.value?.toString()"
           />
         </div>
       </div>

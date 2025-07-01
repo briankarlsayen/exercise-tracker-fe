@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { FormRules, FormItemRule } from "naive-ui";
+import { type FormRules, type FormItemRule } from "naive-ui";
 import { ref } from "vue";
 import { loginApi } from "../api/api";
 import { useRouter } from "vue-router";
@@ -30,7 +30,7 @@ export default {
       ],
       password: [
         {
-          validator(rule: FormItemRule, value: string) {
+          validator(_rule: FormItemRule, value: string) {
             if (!value) return new Error("password is required");
             else if (!/.{8,}/.test(value)) {
               return new Error("Should be 8 characters long");
@@ -76,6 +76,7 @@ export default {
     };
 
     return {
+      loading,
       field,
       fieldRef,
       rules,
@@ -88,7 +89,7 @@ export default {
 <template>
   <div class="container">
     <div class="form-container">
-      <h1>Login</h1>
+      <h2>Login</h2>
       <br />
       <n-form
         ref="fieldRef"
@@ -126,7 +127,12 @@ export default {
           </p>
         </div>
         <div class="btn-container">
-          <n-button type="info" @click="handleSubmit" attr-type="submit"
+          <n-button
+            type="info"
+            @click="handleSubmit"
+            attr-type="submit"
+            :loading="loading"
+            :disabled="!field.password || !field?.username || !!errorMsg"
             >Submit</n-button
           >
         </div>

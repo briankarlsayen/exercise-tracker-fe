@@ -40,6 +40,7 @@ export default defineComponent({
 
     const handleClose = () => {
       emit("update:modelValue", false);
+      loading.value = false;
     };
 
     const field = ref<IExercise>({
@@ -110,7 +111,6 @@ export default defineComponent({
 
         if (store.form.type === "add") {
           const createExerciseRes = await createExercise(exerciseFields);
-          loading.value = false;
 
           const formDate = new Date(exerciseDate?.value);
           const month = formDate.getMonth() + 1;
@@ -124,7 +124,6 @@ export default defineComponent({
           }
         } else {
           const createExerciseRes = await updateExercise(exerciseFields);
-          loading.value = false;
           if (createExerciseRes?.success) {
             await store.fetchExercises(exerciseDate.value);
             return clearForm();
@@ -243,7 +242,7 @@ export default defineComponent({
             type="info"
             attr-type="submit"
             :loading="loading"
-            icon-placement="left"
+            icon-placement="right"
             >Save</n-button
           >
         </div>

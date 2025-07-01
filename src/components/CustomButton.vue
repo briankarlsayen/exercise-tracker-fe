@@ -15,6 +15,5 @@ export default defineComponent({
 });
 </script>
 <template>
-  <!-- <h1>haha</h1> -->
   <n-button rest>{{ name }}</n-button>
 </template>

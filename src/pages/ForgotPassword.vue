@@ -22,7 +22,7 @@ export default {
       email: [
         {
           required: true,
-          validator(rule: FormItemRule, value: string) {
+          validator(_rule: FormItemRule, value: string) {
             if (!value) return false;
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
               return new Error("Invalid email");
@@ -59,7 +59,7 @@ export default {
 <template>
   <div class="container">
     <div class="form-container">
-      <h1>Forgot Password</h1>
+      <h2>Forgot Password</h2>
       <br />
       <n-form
         v-if="showFPForm"

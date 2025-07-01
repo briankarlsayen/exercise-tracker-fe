@@ -19,8 +19,8 @@ export default defineComponent({
       <div class="content-container">
         <div class="text-container">
           <!-- <img class="not-found-img" :src="animateImg" alt="404 image" /> -->
-          <h1 class="logo">404</h1>
-          <h1>Oooops Page Not Found</h1>
+          <h2 class="logo">404</h2>
+          <h2>Oooops Page Not Found</h2>
           <p>Sorry. We cannot find the page you are looking for.</p>
         </div>
         <n-button type="info" @click="goToLogin">Go to login</n-button>

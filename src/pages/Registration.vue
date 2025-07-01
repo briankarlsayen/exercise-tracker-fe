@@ -57,7 +57,7 @@ export default {
       email: [
         {
           required: true,
-          validator(rule: FormItemRule, value: string) {
+          validator(_rule: FormItemRule, value: string) {
             if (!value) return new Error("email is required");
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
               return new Error("Invalid email");
@@ -70,7 +70,7 @@ export default {
       password: [
         {
           required: true,
-          validator(rule: FormItemRule, value: string) {
+          validator(_rule: FormItemRule, value: string) {
             if (!value) return new Error("password is required");
             else if (!/.{8,}/.test(value)) {
               return new Error("Should be 8 characters long");
@@ -92,7 +92,7 @@ export default {
         {
           required: true,
           trigger: ["input", "blur"],
-          validator(rule: FormItemRule, value: string) {
+          validator(_rule: FormItemRule, value: string) {
             if (!value) return new Error("Confirm password is required");
             else if (value === field.value.password) return true;
             return new Error("Should be the same with password");
@@ -167,7 +167,7 @@ export default {
 <template>
   <div class="container">
     <div class="form-container">
-      <h1>Register</h1>
+      <h2>Register</h2>
       <br />
       <n-form
         ref="fieldRef"

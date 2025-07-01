@@ -26,14 +26,15 @@ export default defineComponent({
   },
   methods: {
     getPercentage() {
-      const val = this.$props.cardVal?.split("/");
+      const valStr = this.$props.cardVal?.toString();
+      const val = valStr?.split("/");
       const firstVal = val?.[0];
       const secondVal = val?.[1];
 
       const percentage =
         firstVal && secondVal
           ? (Number(firstVal) / Number(secondVal)) * 100
-          : "";
+          : 0;
 
       const fullVal = Number(percentage) > 100 ? 100 : percentage;
       let status = "warning";
@@ -45,7 +46,7 @@ export default defineComponent({
         status = "warning";
       }
       return {
-        percentage: fullVal ?? "",
+        percentage: fullVal ?? 0,
         status,
       };
     },
