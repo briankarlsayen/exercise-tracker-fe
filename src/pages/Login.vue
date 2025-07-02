@@ -133,6 +133,7 @@ export default {
             attr-type="submit"
             :loading="loading"
             :disabled="!field.password || !field?.username || !!errorMsg"
+            icon-placement="right"
             >Submit</n-button
           >
         </div>
